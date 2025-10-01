@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 import subprocess
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -14,6 +15,12 @@ from .models import LutProfile, PhotoAsset
 class GradeResult:
     processed_path: Path
     gallery_path: Path
+    processed_seconds: float
+    gallery_seconds: float
+
+    @property
+    def total_seconds(self) -> float:
+        return self.processed_seconds + self.gallery_seconds
 
 
 class Grader:
@@ -52,7 +59,7 @@ class Grader:
         if not overwrite and gallery_path.exists():
             raise FileExistsError(gallery_path)
 
-        self._run_ffmpeg(
+        processed_seconds = self._run_ffmpeg(
             [
                 "-y" if overwrite else "-n",
                 "-i",
@@ -65,7 +72,7 @@ class Grader:
             ]
         )
 
-        self._run_ffmpeg(
+        gallery_seconds = self._run_ffmpeg(
             [
                 "-y" if overwrite else "-n",
                 "-i",
@@ -78,15 +85,23 @@ class Grader:
             ]
         )
 
-        return GradeResult(processed_path=processed_path, gallery_path=gallery_path)
+        return GradeResult(
+            processed_path=processed_path,
+            gallery_path=gallery_path,
+            processed_seconds=processed_seconds,
+            gallery_seconds=gallery_seconds,
+        )
 
-    def _run_ffmpeg(self, args: list[str]) -> None:
+    def _run_ffmpeg(self, args: list[str]) -> float:
         cmd = [self._ffmpeg] + args
+        start = time.perf_counter()
         proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        duration = time.perf_counter() - start
         if proc.returncode != 0:
             raise RuntimeError(
                 f"ffmpeg failed (code {proc.returncode})\ncmd: {' '.join(cmd)}\nstdout: {proc.stdout}\nstderr: {proc.stderr}"
             )
+        return duration
 
     def _build_processed_filter(self, lut_path: Path) -> str:
         return f"lut3d=file='{_escape_filter_path(lut_path)}'"

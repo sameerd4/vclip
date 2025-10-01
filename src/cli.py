@@ -129,13 +129,23 @@ def grade_photo(
         raise SystemExit(f"error: LUT '{lut_name}' not found")
 
     grader = Grader(paths)
-    result = grader.apply(asset, lut, overwrite=overwrite)
+    try:
+        result = grader.apply(asset, lut, overwrite=overwrite)
+    except FileExistsError as err:
+        raise SystemExit(f"error: target exists: {err}")
 
     print("Graded photo:")
     print(f"  source:    {asset.path}")
     print(f"  lut:       {lut.name}")
-    print(f"  processed: {result.processed_path}")
-    print(f"  gallery:   {result.gallery_path}")
+    print(
+        f"  processed: {result.processed_path}"
+        f"  [{result.processed_seconds:.2f}s]"
+    )
+    print(
+        f"  gallery:   {result.gallery_path}"
+        f"  [{result.gallery_seconds:.2f}s]"
+    )
+    print(f"  total:     {result.total_seconds:.2f}s")
 
 
 def _resolve_case_insensitive(mapping, key: str):
