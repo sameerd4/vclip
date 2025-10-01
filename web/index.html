@@ -7,19 +7,18 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div class="backdrop" id="backdrop"></div>
   <main>
     <header>
       <h1>Gallery Preview</h1>
       <p id="status">Loading manifest…</p>
     </header>
     <section id="slideshow" class="hidden">
-      <div class="frame">
-        <img id="slide" alt="Gallery preview" />
-      </div>
+      <div class="slides"></div>
       <div class="controls">
-        <button id="prev" type="button">◀</button>
+        <button id="prev" type="button" aria-label="Previous photo">◀</button>
         <span id="caption"></span>
-        <button id="next" type="button">▶</button>
+        <button id="next" type="button" aria-label="Next photo">▶</button>
       </div>
     </section>
   </main>
