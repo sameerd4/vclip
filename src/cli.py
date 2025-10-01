@@ -4,9 +4,20 @@
 from __future__ import annotations
 
 import argparse
+import functools
+import http.server
+import socketserver
 from pathlib import Path
 
-from pipeline import Grader, LutLibrary, ProjectPaths, extract_gps, find_new_photos
+from pipeline import (
+    Grader,
+    LutLibrary,
+    ProjectPaths,
+    build_manifest,
+    extract_gps,
+    find_new_photos,
+    write_manifest,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -41,6 +52,22 @@ def parse_args() -> argparse.Namespace:
         "--no-overwrite",
         action="store_true",
         help="Fail if targets already exist instead of overwriting",
+    )
+    parser.add_argument(
+        "--build-manifest",
+        action="store_true",
+        help="Write gallery manifest JSON",
+    )
+    parser.add_argument(
+        "--serve",
+        action="store_true",
+        help="Serve static gallery preview on localhost",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="Port to use with --serve (default: 8000)",
     )
     return parser.parse_args()
 
@@ -104,6 +131,14 @@ def main() -> None:
         grade_photo(paths, library, args.grade, args.lut, overwrite=not args.no_overwrite)
         return
 
+    if args.build_manifest:
+        out = write_manifest(paths)
+        print(f"Wrote manifest: {out}")
+
+    if args.serve:
+        serve_gallery(paths, port=args.port)
+        return
+
     if args.list:
         list_state(paths, library, show_details=args.details)
         return
@@ -146,6 +181,24 @@ def grade_photo(
         f"  [{result.gallery_seconds:.2f}s]"
     )
     print(f"  total:     {result.total_seconds:.2f}s")
+
+
+def serve_gallery(paths: ProjectPaths, port: int = 8000) -> None:
+    write_manifest(paths)
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler,
+        directory=str(paths.root),
+    )
+    try:
+        with socketserver.TCPServer(("127.0.0.1", port), handler) as server:
+            host, actual_port = server.server_address
+            print(f"Serving gallery at http://{host}:{actual_port}/web/index.html")
+            print("Press Ctrl+C to stop.")
+            server.serve_forever()
+    except KeyboardInterrupt:
+        print("\nStopped." )
+    except OSError as err:
+        raise SystemExit(f"error: could not bind to port {port}: {err}")
 
 
 def _resolve_case_insensitive(mapping, key: str):

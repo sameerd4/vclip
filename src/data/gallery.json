@@ -1,0 +1,67 @@
+{
+  "generated_at": "2025-10-01T18:41:51Z",
+  "landscape": [
+    {
+      "orientation": "landscape",
+      "path": "src/photos/gallery/landscape/DJI_20250920095613_0030_D__golden_light.jpg",
+      "source": "DJI_20250920095613_0030_D",
+      "lut": "Golden Light"
+    },
+    {
+      "orientation": "landscape",
+      "path": "src/photos/gallery/landscape/DJI_20250921191917_0106_D__golden_light.jpg",
+      "source": "DJI_20250921191917_0106_D",
+      "lut": "Golden Light"
+    },
+    {
+      "orientation": "landscape",
+      "path": "src/photos/gallery/landscape/DJI_20250924124839_0016_D__ocean_blues.jpg",
+      "source": "DJI_20250924124839_0016_D",
+      "lut": "Ocean Blues"
+    },
+    {
+      "orientation": "landscape",
+      "path": "src/photos/gallery/landscape/DJI_20250924224636_0029_D__golden_light.jpg",
+      "source": "DJI_20250924224636_0029_D",
+      "lut": "Golden Light"
+    },
+    {
+      "orientation": "landscape",
+      "path": "src/photos/gallery/landscape/DJI_20250924224636_0029_D__violet_night.jpg",
+      "source": "DJI_20250924224636_0029_D",
+      "lut": "Violet Night"
+    }
+  ],
+  "vertical": [
+    {
+      "orientation": "vertical",
+      "path": "src/photos/gallery/vertical/DJI_20250920095608_0029_D__golden_light.jpg",
+      "source": "DJI_20250920095608_0029_D",
+      "lut": "Golden Light"
+    },
+    {
+      "orientation": "vertical",
+      "path": "src/photos/gallery/vertical/DJI_20250923185811_0003_D__golden_light.jpg",
+      "source": "DJI_20250923185811_0003_D",
+      "lut": "Golden Light"
+    },
+    {
+      "orientation": "vertical",
+      "path": "src/photos/gallery/vertical/DJI_20250924124743_0014_D__ocean_blues.jpg",
+      "source": "DJI_20250924124743_0014_D",
+      "lut": "Ocean Blues"
+    },
+    {
+      "orientation": "vertical",
+      "path": "src/photos/gallery/vertical/DJI_20250924224624_0028_D__golden_light.jpg",
+      "source": "DJI_20250924224624_0028_D",
+      "lut": "Golden Light"
+    },
+    {
+      "orientation": "vertical",
+      "path": "src/photos/gallery/vertical/DJI_20250924224624_0028_D__violet_night.jpg",
+      "source": "DJI_20250924224624_0028_D",
+      "lut": "Violet Night"
+    }
+  ]
+}
