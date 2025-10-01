@@ -7,6 +7,7 @@ import argparse
 import functools
 import http.server
 import socketserver
+import subprocess
 from pathlib import Path
 
 from pipeline import (
@@ -184,15 +185,30 @@ def grade_photo(
 
 
 def serve_gallery(paths: ProjectPaths, port: int = 8000) -> None:
-    write_manifest(paths)
+    build_script = paths.root / "scripts" / "build.sh"
+    serve_dir = paths.root
+    if build_script.exists():
+        try:
+            subprocess.run(["bash", str(build_script)], check=True)
+            serve_dir = paths.root / "dist"
+        except subprocess.CalledProcessError as err:
+            raise SystemExit(f"error: build failed ({err.returncode})")
+    else:
+        write_manifest(paths)
+        serve_dir = paths.root
+
     handler = functools.partial(
         http.server.SimpleHTTPRequestHandler,
-        directory=str(paths.root),
+        directory=str(serve_dir),
     )
     try:
         with socketserver.TCPServer(("127.0.0.1", port), handler) as server:
             host, actual_port = server.server_address
-            print(f"Serving gallery at http://{host}:{actual_port}/web/index.html")
+            if serve_dir.name == "dist":
+                start_path = "index.html"
+            else:
+                start_path = "web/index.html"
+            print(f"Serving gallery at http://{host}:{actual_port}/{start_path}")
             print("Press Ctrl+C to stop.")
             server.serve_forever()
     except KeyboardInterrupt:

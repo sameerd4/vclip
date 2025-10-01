@@ -19,7 +19,7 @@ mq.addEventListener("change", () => {
 
 async function init() {
   try {
-    const res = await fetch("/src/data/gallery.json", { cache: "no-store" });
+    const res = await fetch("data/gallery.json", { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     manifest = await res.json();
     statusEl.textContent = "Ready";
@@ -54,7 +54,7 @@ function render() {
   }
   slideshowEl.classList.remove("hidden");
   const entry = activeList[index];
-  imgEl.src = `/${entry.path}`;
+  imgEl.src = entry.path;
   captionEl.textContent = `${entry.source} · ${entry.lut}`;
 }
 

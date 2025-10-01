@@ -42,7 +42,7 @@ def _collect_entries(paths: ProjectPaths) -> Iterable[GalleryEntry]:
             continue
         for file in sorted(base_dir.glob("*.jpg")):
             source, lut = _parse_name(file.name)
-            rel = file.relative_to(paths.root)
+            rel = Path("gallery") / orientation / file.name
             yield GalleryEntry(
                 orientation=orientation,
                 path=str(rel),
