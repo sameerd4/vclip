@@ -12,6 +12,9 @@ let index = 0;
 let autoplayTimer = null;
 const AUTOPLAY_MS = 6500;
 const mq = window.matchMedia("(orientation: portrait)");
+let touchStartX = null;
+let touchStartY = null;
+const SWIPE_MIN_DISTANCE = 40;
 
 prevBtn.addEventListener("click", () => {
   advance(-1);
@@ -20,6 +23,15 @@ prevBtn.addEventListener("click", () => {
 nextBtn.addEventListener("click", () => {
   advance(1);
   restartAutoplay();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowLeft") {
+    advance(-1);
+    restartAutoplay();
+  } else if (event.key === "ArrowRight") {
+    advance(1);
+    restartAutoplay();
+  }
 });
 mq.addEventListener("change", () => {
   selectOrientation();
@@ -33,6 +45,10 @@ document.addEventListener("visibilitychange", () => {
     restartAutoplay();
   }
 });
+
+slideshowEl.addEventListener("touchstart", handleTouchStart, { passive: true });
+slideshowEl.addEventListener("touchmove", handleTouchMove, { passive: true });
+slideshowEl.addEventListener("touchend", handleTouchEnd, { passive: true });
 
 async function init() {
   try {
@@ -166,6 +182,48 @@ function stopAutoplay() {
 function restartAutoplay() {
   stopAutoplay();
   startAutoplay();
+}
+
+function handleTouchStart(event) {
+  if (event.touches.length !== 1) return;
+  const touch = event.touches[0];
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+}
+
+function handleTouchMove(event) {
+  if (event.touches.length !== 1) return;
+  // Prevent vertical scrolling when swiping horizontally across the slideshow
+  if (touchStartX === null || touchStartY === null) return;
+  const touch = event.touches[0];
+  const dx = Math.abs(touch.clientX - touchStartX);
+  const dy = Math.abs(touch.clientY - touchStartY);
+  if (dx > dy) {
+    event.preventDefault();
+  }
+}
+
+function handleTouchEnd(event) {
+  if (!touchStartX || !touchStartY) {
+    touchStartX = touchStartY = null;
+    return;
+  }
+
+  const touch = event.changedTouches[0];
+  const dx = touch.clientX - touchStartX;
+  const dy = touch.clientY - touchStartY;
+  touchStartX = touchStartY = null;
+
+  if (Math.abs(dx) < SWIPE_MIN_DISTANCE || Math.abs(dx) < Math.abs(dy)) {
+    return;
+  }
+
+  if (dx > 0) {
+    advance(-1);
+  } else {
+    advance(1);
+  }
+  restartAutoplay();
 }
 
 init();
